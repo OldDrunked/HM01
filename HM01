@@ -1,0 +1,33 @@
+<HTML>
+<BODY>
+
+<canvas id='HM01' height='1000' width = '1000' style='border:1px solid'>
+</canvas>
+
+<script>
+var canvas = document.getElementById('HM01');
+var ctx = canvas.getContext('2d');
+var b=0;
+var j=0;
+var intervalID;
+ctx.fillStyle = "#FF00FF";
+canvas.addEventListener('click',function(event){
+if(b==0){
+intervalID=setInterval(function(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillRect(100*Math.cos(3.14*j/180)+500,100*Math.sin(3.14*j/180)+500,10,10);
+j+=1;
+},10);
+b=1;
+}
+else if(b==1)
+{
+clearInterval(intervalID);
+b=0;
+}
+});
+ctx.fillRect(100*Math.cos(0)+0,100*Math.sin(0)+0,10,10);
+</script>
+
+</BODY>
+</HTML>
