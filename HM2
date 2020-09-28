@@ -1,0 +1,36 @@
+<HTML>
+<BODY>
+<canvas id='HM2' height='500' width='500' style='border:1px solid'>
+</canvas>
+<canvas id='HM02' height='500' width='500' style='border:1px solid'>
+</canvas>
+<a href='#' id='btn' class='button' style='font-size: 200%'>BUTTON</a>
+
+<script>
+	var canvas = document.getElementById('hw21');
+	var ctx = canvas.getContext('2d');
+	var canvas2 = document.getElementById('hw22');
+	var ctx2 = canvas2.getContext('2d');
+	var im = new Image();
+	im.src = 'test.jpg';
+	im.onload = function() {
+		ctx.drawImage(img, 0, 0);
+	};
+	var graysc = function() {
+		var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		for(var i = 0; i < imageData.data.length; i += 4){
+            var avg = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;  
+            imageData.data[i] = avg;   
+            imageData.data[i + 1] = avg;   
+            imageData.data[i + 2] = avg;  
+		}
+		ctx2.putImageData(imageData, 0, 0);
+	};
+
+	var grayscbtn = document.getElementById('btn');
+	grayscbtn.addEventListener('click', graysc);
+
+</script>
+
+</BODY>
+</HTML>
