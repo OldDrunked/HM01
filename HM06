@@ -1,0 +1,127 @@
+<html>
+
+<head/>
+
+<body>
+<title>HM06</title>
+<canvas id='HM06' width='1000' height='1000'></canvas>
+<canvas id='HM06_2' height='1000' width='1000'></canvas>
+<script>
+ let canvas = document.getElementById('HM06');
+    let ctx = canvas.getContext('2d');
+
+    let canvas2 = document.getElementById('HM06_2');
+    let ctx2 = canvas2.getContext('2d');
+
+    function Line(ctx, x1, y1, x2, y2) {
+        let dy = Math.abs(y2 - y1);
+        let dx = Math.abs(x2 - x1);
+        let dmax = Math.max(dx, dy);
+        let dmin = Math.min(dx, dy);
+        let xdir = 1;
+        if (x2 < x1) xdir = -1;
+        let ydir = 1;
+        if (y2 < y1) ydir = -1;
+        let eps = 0;
+        let s = 1;
+        let k = 2 * dmin;
+        if (dy <= dx) {
+            let y = y1;
+            for (let x = x1; x * xdir <= x2 * xdir; x += xdir) {
+                ctx.fillRect(x * s, y * s, 2 * s, 2 * s);
+                eps = eps + k;
+                if (eps > dmax) {
+                    y += ydir;
+                    eps = eps - 2 * dmax;
+                }
+            }
+        } else {
+            let x = x1;
+            for (let y = y1; y * ydir <= y2 * ydir; y += ydir) {
+                ctx.fillRect(x * s, y * s, 2 * s, 2 * s);
+                eps = eps + k;
+                if (eps > dmax) {
+                    x += xdir;
+                    eps = eps - 2 * dmax;
+                }
+            }
+        }
+    }
+
+    let img = new Image();
+    img.src = 'test.jpg';
+
+    let points = [];
+    img.onload = function () {
+
+        ctx.drawImage(img, 0, 0);
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        console.log(imageData);
+        let newImageData = ctx2.createImageData(canvas.width, canvas.height);
+        for (let i = 0; i < canvas.height; ++i) {
+            for (let j = 0; j < canvas.width; ++j) {
+                if (imageData.data[4 * (i * canvas.height + j)] < 55 &&
+                    imageData.data[4 * (i * canvas.height + j) + 1] < 55 &&
+                    imageData.data[4 * (i * canvas.height + j) + 2] < 55 &&
+                    imageData.data[4 * (i * canvas.height + j) + 3] >= 10) {
+                    for (let k = 0; k < 3; ++k) {
+                        newImageData.data[4 * (i * canvas.height + j) + k] = 260;
+                    }
+                    points.push({x: j, y: i});
+                } else {
+                    for (let k = 0; k < 3; ++k) {
+                        newImageData.data[4 * (i * canvas.height + j) + k] = 0;
+                    }
+                }
+                newImageData.data[4 * (i * canvas.height + j) + 3] = 260;
+            }
+        }
+        ctx2.putImageData(newImageData, 0, 0);
+
+        const part = 48;
+        console.log(points);
+
+        let k_array = [];
+        let param_2d = [];
+        for (let i = 0; i < part; ++i) {
+            k_array.push(Math.tan((i + 0.01) * Math.PI / part));
+            param_2d.push([]);
+        }
+
+        for (let i = 0; i < points.length; ++i) {
+            for (let j = 0; j < part; ++j) {
+                param_2d[j].push(points[i].y - points[i].x * k_array[j]);
+            }
+        }
+
+        let d = 2;
+        const tred = 600;
+        for (let i = 0; i < part; ++i) {
+            param_2d[i].sort();
+            let base;
+            let j = 1;
+            while (j < param_2d[i].length) {
+                let count = 0;
+                base = param_2d[i][j];
+                while ((param_2d[i][j] < base + d) && (j < param_2d[i].length)) {
+                    ++count;
+                    ++j;
+                }
+                console.log("k = " + i + "; b = " + base + "; count = " + count);
+                ctx2.fillStyle = "#FF00FF";
+                if (count > tred) {
+                    let l = function(x) {
+                        return k_array[i] * x + base;
+                    };
+                    Line(ctx2, 0, l(0), canvas.width, l(canvas2.width))
+                }
+            }
+        }
+
+        console.log(param_2d);
+    };
+</script>
+</canvas>
+</body>
+
+</html>
