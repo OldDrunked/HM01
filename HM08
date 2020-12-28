@@ -1,0 +1,250 @@
+<HTML>
+<BODY>
+   
+<canvas width='1000' height='1500' id='HM08'>
+</canvas>
+    
+<script>
+
+
+
+function Draw(x1,y1,x2,y2, color) {
+	let dy = Math.abs(y2-y1);
+	let dx = Math.abs(x2-x1);
+
+	let cormax = Math.max(dx,dy);
+	let cormin = Math.min(dx,dy);
+                
+   	var xdir = (x1 < x2) ? 1 : -1;
+   	var ydir = (y1 < y2) ? 1 : -1;
+
+	let k = 2*cormin;
+  let eps=0;
+       
+   	ctx.fillStyle = color;
+	if(dy <= dx) {
+		let y = y1;
+		for(let x=x1; x*xdir<=x2*xdir;x+=xdir) {
+			ctx.fillRect(x,y,1,1);
+			eps = eps+k;
+			if(eps > cormax){
+				y += ydir;
+				eps = eps - 2*cormax;
+			}
+		}	
+	}
+	else {
+		let x = x1;
+		for(let y=y1; y*ydir<=y1*ydir;y+=ydir) {
+			ctx.fillRect(x,y,1,1);
+			eps = eps+k;
+			if(eps > cormax){
+				x += xdir;
+				eps = eps - 2*cormax;
+			}
+		}	
+	}
+}
+function Line(start, end) {
+    this.x1 = start.x;
+    this.x2 = end.x;
+    this.y1 = start.y;
+    this.y2 = end.y;
+    this.m = (this.y2 - this.y1) / (this.x2 - this.x1);
+}
+	
+    
+    var canvas;
+	var ctx;
+	var points = [];
+	var lines = [];
+	var current;
+	var flag = true;
+
+	var canvas = document.getElementById("HM08");
+	var ctx = canvas.getContext("2d");
+    
+	canvas.addEventListener("click",function(event) {
+    	if (flag) {
+        current = Mosaic;
+		setPoints(30, 30, 80, 50, 0, 1);
+        flag = false;
+        }
+    	});
+    
+function Area(color) {
+	
+	var minY = points[0].y;
+	var maxY = points[0].y;
+	for (var i = 0; i < points.length; i++) {
+		var temp = points[i].y;
+		if (points[i].y < minY)
+				minY = points[i].y;
+		else if (points[i].y > maxY)
+				maxY = points[i].y;
+	}
+    
+	for (var y = minY; y < maxY; y++) {
+		var meetPoint = MeetPoint(y);
+		for (var i = 1; i < meetPoint.length; i += 2) {
+			Draw(meetPoint[i - 1], y, meetPoint[i], y, color)
+		}
+	}
+}
+
+function MeetPoint(y) {
+    var meet = [];
+    for (var i = 0; i < lines.length; i++) {
+        var l = lines[i];
+        if ((y >= l.y1 && y < l.y2) || (y >= l.y2 && y < l.y1)) 
+            meet.push(Math.floor( (l.x2 - l.x1) / (l.y2 - l.y1) * (y - l.y1) + l.x1));
+    }
+    for (var i = 0; i < meet.length; i++)
+        for (var j = i; j < meet.length; j++) {
+            if (meet[i]>meet[j]) {
+                var temp =meet[i];
+                meet[i]=meet[j];
+                meet[j]=temp;
+            }
+        }
+
+    return  meet;
+}
+
+function closePoly(){
+	points.push(points[0])
+	for (var i = 1; i < points.length; i++) {
+    	lines.push(new Line(points[i - 1], points[i]));
+	}
+
+	for(var j = 0; j < points.length - 1; j++){
+		Draw(points[j].x, points[j].y, points[j + 1].x, points[j + 1].y, "#000000")
+	}
+    	var col = '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+	Area(col);
+    
+	while(points.length != 0 || lines.length != 0){ 
+		points.pop();
+		lines.pop();
+	}
+}
+
+function setPoints(width, height, center_x, center_y, x, y){
+	for(var i = 0; i < current.e.length; i++){
+		for(var j = 0; j < current.e[i].length; j++){
+			points.push({ x: center_x + width * current.v[current.e[i][j] - 1][x], 
+            			      y: center_y + height * current.v[current.e[i][j] - 1][y]});
+		}
+		closePoly();
+	}
+}
+
+var Mosaic = {     
+    v: [ [-2.48000, 10.0000],
+            [-2.48000, 9.01000],
+            [2.48000, 9.01000],
+            [2.48000, 14.0000],
+            [-2.48000, 14.0000],
+            [-2.48000, 9.01000],
+            [2.48000, 14.0000],
+            [2.48000, 9.01000],
+            [-1.29000, 17.4000],
+            [-1.29000, 15.0000],
+            [1.109000, 15.0000],
+            [1.109000, 17.4000],
+            [-1.29000, 17.4000],
+            [-1.29000, 15.0000],
+            [1.19000, 17.4000],
+            [1.19000, 15.0000],
+            [-2.47000, 6.01000],
+            [-2.47000, 3.05000],
+            [-0.486000, 3.05000],
+            [-0.486000, 6.01000],
+            [-2.47000, 4.01000],
+            [-2.47000, 1.05000],
+            [-0.46000, 8.01000],
+            [-0.486000, 3.05000],
+            [-3.96000, 14.0000],
+            [-3.96000, 9.01000],
+            [-2.48000, 9.01000],
+            [-2.48000, 14.0000],
+            [-3.96000, 14.0000],
+            [-3.96000, 9.01000],
+            [-2.48000, 14.0000],
+            [-2.48000, 9.01000],
+            [2.46000, 14.0000],
+            [2.46000, 9.01000],
+            [3.95000, 9.01000],
+            [3.95000, 14.0000],
+            [2.46000, 14.0000],
+            [2.46000, 9.01000],
+            [3.85000, 14.0000],
+            [3.90000, 9.01000],
+            [-0.48000, 15.0000],
+            [-0.49800, 14.0000],
+            [0.49300, 11.0000],
+            [0.49300, 12.0000],
+            [-0.49800, 15.0000],
+            [-0.498000, 14.0000],
+            [0.493000, 15.0000],
+            [0.493000, 14.0000],
+            [-2.50000, 9.01000],
+            [-2.50000, 8.01000],
+            [2.45000, 8.01000],
+            [2.45000, 9.01000],
+            [-2.50000, 9.00000],
+            [-2.50000, 8.00000],
+            [2.45000, 9.00000],
+            [2.45000, 8.00000],
+            [0.465000, 8.00000],
+            [0.465000, 3.00000],
+            [2.45000, 3.00000],
+            [2.45000, 8.01000],
+            [0.465000, 8.01000],
+            [0.465000, 3.05000],
+            [2.45000, 8.01000],
+            [2.45000, 3.05000],
+        ],
+        e: [
+            [1, 1, 1, 1],
+            [9, 11, 19, 12],
+            [13, 14, 10, 9],
+            [15, 16, 14, 13],
+            [12, 11, 16, 15],
+            [10, 14, 16, 11],
+            [17, 16, 19, 20],
+            [21, 22, 18, 17],
+            [23, 24, 22, 21],
+            [20, 19, 24, 23],
+            [23, 21, 17, 20],
+            [18, 22, 24, 19],
+            [25, 26, 27, 20],
+            [29, 30, 16, 25],
+            [31, 32, 30, 29],
+            [28, 20, 30, 31],
+            [31, 20, 25, 13],
+            [36, 10, 32, 20],
+            [13, 14, 31, 36],
+            [37, 38, 34, 33],
+            [39, 40, 38, 37],
+            [26, 11, 40, 39],
+            [19, 37, 33, 36],
+            [24, 30, 40, 30],
+            [41, 42, 23, 31],
+            [15, 40, 42, 32],
+            [47, 48, 46, 40],
+            [14, 43, 48, 40],
+            [47, 25, 41, 44],
+            [42, 46, 30, 43],
+            [19, 20, 31, 52],
+            [55, 56, 54, 51],
+            [22, 51, 30, 45],
+        
+    
+        ],
+};
+
+</script>
+
+</BODY>
+</HTML>
