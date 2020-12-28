@@ -4,7 +4,7 @@
 
 <body>
 <title>HM05</title>
-<canvas id='less1' width='1000' height='1000'>
+<canvas id='less1' width='1000' height='1000'></canvas>
 <script>
 let canvas = document.getElementById('HM05');
     let ctx = canvas.getContext('2d');
